@@ -1,10 +1,11 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using VehicleInsurance.Models;
 
 namespace VehicleInsurance.Data
 {
-    public class ApplicationDbContext : IdentityDbContext
+    public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
@@ -19,7 +20,7 @@ namespace VehicleInsurance.Data
 
             builder.HasDefaultSchema("dbo");
 
-            builder.Entity<IdentityUser>(entity => { entity.ToTable(name: "User"); });
+            builder.Entity<ApplicationUser>(entity => { entity.ToTable(name: "User"); });
 
             builder.Entity<IdentityRole>(entity => { entity.ToTable(name: "Roles"); });
 
