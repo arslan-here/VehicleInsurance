@@ -6,6 +6,8 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Net;
+using System.Net.Mail;
 using System.Text;
 using System.Text.Encodings.Web;
 using System.Threading;
@@ -76,11 +78,17 @@ namespace VehicleInsurance.Areas.Identity.Pages.Account
             ///     directly from your code. This API may change or be removed in future releases.
             /// </summary>
             /// 
-            [Required]
+            [Required(ErrorMessage = "Full Name is required")]
+            [StringLength(100, MinimumLength = 2, ErrorMessage = "Full Name must be between 2 and 100 characters")]
             public string FullName { get; set; }
 
-            [Required]
+            [Required(ErrorMessage = "Address is required")]
+            [StringLength(200, MinimumLength = 5, ErrorMessage = "Address must be between 5 and 200 characters")]
             public string Address { get; set; }
+
+            [Required(ErrorMessage = "Phone Number is required")]
+            [RegularExpression(@"^(03(?!00|33)\d{9})$", ErrorMessage = "Phone number must be 11 digits and First 2 digits must be '03'.")]
+            public string PhoneNumber { get; set; }
 
             [Required]
             [EmailAddress]
@@ -116,18 +124,21 @@ namespace VehicleInsurance.Areas.Identity.Pages.Account
 
         public async Task<IActionResult> OnPostAsync(string returnUrl = null)
         {
-           
+
 
             returnUrl ??= Url.Content("~/");
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
             if (ModelState.IsValid)
             {
-                
+
 
                 var user = CreateUser();
 
+                //Adding Custom Attributes
+
                 user.FullName = Input.FullName;
                 user.Address = Input.Address;
+                user.PhoneNumber = Input.PhoneNumber;
 
                 await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
                 await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
@@ -168,6 +179,9 @@ namespace VehicleInsurance.Areas.Identity.Pages.Account
             // If we got this far, something failed, redisplay form
             return Page();
         }
+
+
+        
 
         private ApplicationUser CreateUser()
         {

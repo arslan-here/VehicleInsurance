@@ -1,7 +1,10 @@
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using VehicleInsurance.Data;
 using VehicleInsurance.Models;
+using VehicleInsurance.Services;
 
 namespace VehicleInsurance
 {
@@ -17,9 +20,20 @@ namespace VehicleInsurance
                 options.UseSqlServer(connectionString));
             builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
-            builder.Services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true)
+            builder.Services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true) 
                 .AddEntityFrameworkStores<ApplicationDbContext>();
+
             builder.Services.AddControllersWithViews();
+            //Email Configuration
+
+            //builder.Services.Configure<IdentityOptions>(options =>
+            //{
+            //    options.SignIn.RequireConfirmedEmail = false;
+            //});
+
+            builder.Services.AddTransient<IEmailSender, EmailSender>();
+            builder.Services.Configure<AuthMessageSenderOptions>(builder.Configuration);
+
 
             var app = builder.Build();
 
